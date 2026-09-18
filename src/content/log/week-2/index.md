@@ -61,10 +61,10 @@ The **Test** screen predicts your pick before you make it. The headline number o
 
 <!-- The screenshots above use a fresh demo lens trained by a script that prefers concrete modernism, not my own lens. Swap in shots of the real one when you like. -->
 
-Accounts and sync went in the same day. The schema is on Supabase with row-level security on every table, and there's a check that runs the migration against an in-memory Postgres to prove users can't see each other's data. It's deployed on Vercel.
+Accounts and sync went in the same day. The schema is on Supabase with row-level security on every table, and there's a check that runs the migration against an in-memory Postgres to prove users can't see each other's data. It's live at [tastelens-ebon.vercel.app](https://tastelens-ebon.vercel.app/).
 
 ## Next
 
-- TasteLens needs a public URL. The Vercel deployment is still behind Vercel's login, and `tastelens.vercel.app` belongs to someone else.
+- Turn accounts on for the live TasteLens site. The Vercel build doesn't have the Supabase settings yet, so for now it runs local-only.
 - Get CritRPG into git and online.
 - Week 3 is business planning: name, problem, who has it, and a website for the pitch.

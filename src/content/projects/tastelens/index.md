@@ -1,8 +1,9 @@
 ---
 name: TasteLens
 tagline: Pinterest and Miro, but not crap. A taste trainer that learns your eye from quick A/B picks.
-status: in progress
+status: live
 started: 2026-09-17
+site: https://tastelens-ebon.vercel.app/
 repoPrivate: true
 stack: [React, TypeScript, CLIP via transformers.js, Supabase, Vercel]
 cover: ./cover.jpg
