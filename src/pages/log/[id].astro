@@ -1,0 +1,79 @@
+---
+import { getImage } from 'astro:assets';
+import { getEntries, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectLinks from '../../components/ProjectLinks.astro';
+import { getWeeks, weekHref, projectHref } from '../../lib/content';
+import { weekRange, weekTheme, pad } from '../../lib/weeks';
+
+export async function getStaticPaths() {
+  const weeks = await getWeeks();
+  return weeks.map((entry, i) => ({
+    params: { id: entry.id },
+    // weeks are newest-first, so the "next" week is the one before in the array
+    props: { entry, newer: weeks[i - 1], older: weeks[i + 1] },
+  }));
+}
+
+const { entry, newer, older } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+const projects = await getEntries(data.projects);
+const theme = weekTheme(data.week, data.theme);
+const og = data.cover ? (await getImage({ src: data.cover, width: 1200, format: 'jpg' })).src : undefined;
+---
+
+<Base title={`Week ${data.week}: ${data.title}`} description={data.summary} image={og}>
+  <article>
+    <header class="post-head wrap">
+      <a class="back" href="/">← All weeks</a>
+      <div class="post-meta">
+        <span class="eyebrow">Week {pad(data.week)} · {weekRange(data.week)}</span>
+        {theme && <span class="theme">{theme}</span>}
+      </div>
+      <h1 class="display">{data.title}</h1>
+      <p class="lede">{data.summary}</p>
+    </header>
+
+    {/* The cover is the thumbnail on the contents page and the social preview; posts open with their own images. */}
+    {
+      projects.length > 0 && (
+        <aside class="wrap post-projects" aria-label="Projects this week">
+          {projects.map((p) => (
+            <section class="post-project">
+              <header>
+                <h2><a href={projectHref(p.id)}>{p.data.name}</a></h2>
+                <span class:list={['status', { live: p.data.status === 'live' }]}>{p.data.status}</span>
+              </header>
+              <p>{p.data.tagline}</p>
+              <ProjectLinks project={p.data} />
+            </section>
+          ))}
+        </aside>
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <nav class="pager wrap" aria-label="Other weeks">
+      {
+        older && (
+          <a class="prev" href={weekHref(older)}>
+            <span class="eyebrow">← Week {pad(older.data.week)}</span>
+            <strong>{older.data.title}</strong>
+          </a>
+        )
+      }
+      {
+        newer && (
+          <a class="next" href={weekHref(newer)}>
+            <span class="eyebrow">Week {pad(newer.data.week)} →</span>
+            <strong>{newer.data.title}</strong>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>

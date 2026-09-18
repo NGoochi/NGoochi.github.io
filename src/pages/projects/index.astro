@@ -1,0 +1,18 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+---
+
+<Base title="Projects" description="Every app in the log, with links to play it and its source where public.">
+  <section class="intro wrap">
+    <p class="eyebrow">{projects.length} apps</p>
+    <h1 class="display">Projects</h1>
+    <p class="lede">Everything the log covers, oldest first. Each page links to the weeks it appears in.</p>
+  </section>
+  <div class="wrap project-grid">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </div>
+</Base>

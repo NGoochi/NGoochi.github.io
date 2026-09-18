@@ -1,0 +1,23 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import ProjectLinks from './ProjectLinks.astro';
+import { projectHref } from '../lib/content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { data } = project;
+---
+
+<article class="project-card">
+  <a class="cover" href={projectHref(project.id)} tabindex="-1" aria-hidden="true">
+    {data.cover && <Image src={data.cover} alt="" widths={[480, 800, 1200]} sizes="(min-width: 1120px) 360px, (min-width: 700px) 45vw, 100vw" />}
+  </a>
+  <div class="body">
+    <h3><a href={projectHref(project.id)}>{data.name}</a><span class:list={['status', { live: data.status === 'live' }]}>{data.status}</span></h3>
+    <p>{data.tagline}</p>
+    <ProjectLinks project={data} />
+  </div>
+</article>

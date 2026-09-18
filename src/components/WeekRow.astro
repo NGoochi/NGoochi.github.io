@@ -1,0 +1,39 @@
+---
+import { Image } from 'astro:assets';
+import { getEntries, type CollectionEntry } from 'astro:content';
+import { weekRange, weekTheme, pad } from '../lib/weeks';
+import { weekHref } from '../lib/content';
+
+interface Props {
+  entry: CollectionEntry<'log'>;
+}
+const { entry } = Astro.props;
+const { data } = entry;
+const projects = await getEntries(data.projects);
+const theme = weekTheme(data.week, data.theme);
+---
+
+<li class="week">
+  <a href={weekHref(entry)}>
+    <div class="wk">
+      <span class="eyebrow">Week</span>
+      <span class="wk-num">{pad(data.week)}</span>
+      <span class="wk-dates">{weekRange(data.week)}</span>
+    </div>
+    <div class="week-body">
+      {theme && <p class="theme">{theme}</p>}
+      <h3>{data.title}{data.draft && ' (draft)'}</h3>
+      <p>{data.summary}</p>
+      <ul class="chips">
+        {projects.map((p) => <li class="chip">{p.data.name}</li>)}
+      </ul>
+    </div>
+    {
+      data.cover && (
+        <div class="week-cover">
+          <Image src={data.cover} alt={data.coverAlt} widths={[400, 760, 1100]} sizes="(min-width: 860px) 380px, 100vw" />
+        </div>
+      )
+    }
+  </a>
+</li>

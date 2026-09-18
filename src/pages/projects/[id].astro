@@ -1,0 +1,62 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectLinks from '../../components/ProjectLinks.astro';
+import WeekRow from '../../components/WeekRow.astro';
+import { getProjects, getWeeks } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const [projects, weeks] = await Promise.all([getProjects(), getWeeks()]);
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project, weeks: weeks.filter((w) => w.data.projects.some((p) => p.id === project.id)) },
+  }));
+}
+
+const { project, weeks } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+const started = data.started.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const og = data.cover ? (await getImage({ src: data.cover, width: 1200, format: 'jpg' })).src : undefined;
+---
+
+<Base title={data.name} description={data.tagline} image={og}>
+  <header class="project-head wrap">
+    <a class="back" href="/projects/">← All projects</a>
+    <h1 class="display">{data.name}</h1>
+    <p class="lede">{data.tagline}</p>
+    <div class="facts">
+      <span><b class:list={['status', { live: data.status === 'live' }]}>{data.status}</b></span>
+      <span>Started <b>{started}</b></span>
+      <span>In the log <b>{weeks.length} {weeks.length === 1 ? 'week' : 'weeks'}</b></span>
+    </div>
+    <ProjectLinks project={data} />
+    {data.stack.length > 0 && <ul class="chips">{data.stack.map((s) => <li class="chip">{s}</li>)}</ul>}
+  </header>
+
+  {
+    data.cover && (
+      <div class="hero">
+        <Image src={data.cover} alt={data.coverAlt} widths={[800, 1400, 2000]} sizes="(min-width: 1120px) 1120px, 100vw" loading="eager" />
+      </div>
+    )
+  }
+
+  <div class="prose">
+    <Content />
+  </div>
+
+  {
+    weeks.length > 0 && (
+      <section class="wrap" style="margin-top: 64px" aria-labelledby="weeks-h">
+        <div class="section-head">
+          <h2 id="weeks-h">In the log</h2>
+        </div>
+        <ol class="weeks">
+          {weeks.map((entry) => <WeekRow entry={entry} />)}
+        </ol>
+      </section>
+    )
+  }
+</Base>

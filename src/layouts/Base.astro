@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+import { SITE } from '../site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+const { title, description = SITE.description, image } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE.title}` : `${SITE.title} · ${SITE.author}`;
+const path = Astro.url.pathname;
+const active = (prefix: string) => (prefix === '/' ? path === '/' || path.startsWith('/log') : path.startsWith(prefix));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    {image && <meta property="og:image" content={new URL(image, Astro.site)} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
+    />
+  </head>
+  <body>
+    <header class="site-head">
+      <div class="wrap site-head-inner">
+        <a class="wordmark" href="/">Folio<span>.</span></a>
+        <nav aria-label="Main">
+          <a href="/" aria-current={active('/') ? 'page' : undefined}>Log</a>
+          <a href="/projects/" aria-current={active('/projects') ? 'page' : undefined}>Projects</a>
+          <a href={SITE.github} rel="me">GitHub&nbsp;↗</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-foot">
+      <div class="wrap">
+        <span>{SITE.author} · {new Date().getFullYear()}</span>
+        <span>Written in Markdown, built with Astro, hosted on GitHub Pages.</span>
+      </div>
+    </footer>
+  </body>
+</html>

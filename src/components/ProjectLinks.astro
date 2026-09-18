@@ -1,0 +1,15 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>['data'];
+}
+const { project } = Astro.props;
+---
+
+<div class="links">
+  {project.site && <a class="btn primary" href={project.site}>Try it live&nbsp;↗</a>}
+  {project.repo && <a class="btn" href={project.repo}>Source&nbsp;↗</a>}
+  {!project.repo && project.repoPrivate && <span class="btn muted">Source not public</span>}
+  {!project.site && <span class="btn muted">Not deployed yet</span>}
+</div>

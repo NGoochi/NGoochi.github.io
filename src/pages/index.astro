@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import WeekRow from '../components/WeekRow.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getWeeks, getProjects } from '../lib/content';
+import { THEMES } from '../site';
+import { pad, weekRange } from '../lib/weeks';
+
+const weeks = await getWeeks();
+const projects = await getProjects();
+const latest = weeks[0]?.data.week ?? 0;
+// The next course week, shown faintly at the top of the log until it's written up.
+const next = THEMES[latest + 1] ? latest + 1 : undefined;
+const live = projects.filter((p) => p.data.status === 'live').length;
+---
+
+<Base>
+  <section class="intro wrap">
+    <p class="eyebrow">Project log · 2026</p>
+    <h1 class="display">Small apps, built with coding agents, <em>one week at a time.</em></h1>
+    <p class="lede">
+      Every week I ship an app or an update. This is the log: screenshots, clips, links, and notes on what worked and
+      what didn't.
+    </p>
+    <dl class="stats">
+      <div><dt>Weeks logged</dt><dd>{weeks.length}</dd></div>
+      <div><dt>Apps</dt><dd>{projects.length}</dd></div>
+      <div><dt>Live</dt><dd>{live}</dd></div>
+    </dl>
+  </section>
+
+  <section class="wrap" aria-labelledby="log-h">
+    <div class="section-head">
+      <h2 id="log-h">The log</h2>
+      <span class="eyebrow">Newest first</span>
+    </div>
+    <ol class="weeks">
+      {
+        next && (
+          <li class="week upcoming">
+            <div>
+              <span class="wk-num">{pad(next)}</span>
+              <p class="theme">
+                Up next: {THEMES[next]} <span class="wk-dates">· {weekRange(next)}</span>
+              </p>
+            </div>
+          </li>
+        )
+      }
+      {weeks.map((entry) => <WeekRow entry={entry} />)}
+    </ol>
+  </section>
+
+  <section class="wrap" aria-labelledby="projects-h" style="margin-top: 80px">
+    <div class="section-head">
+      <h2 id="projects-h">Projects</h2>
+      <a class="eyebrow" href="/projects/">All projects →</a>
+    </div>
+    <div class="project-grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+</Base>
